@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Калькулятор размера позиции</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 15px;
+            line-height: 1.5;
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            margin-top: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .content {
+            padding: 20px 15px;
+        }
+        
+        .calculator-section, .results-section {
+            width: 100%;
+        }
+        
+        .calculator-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+        }
+        
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid #e1e5eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: #f9fafc;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 18px;
+            padding-right: 45px;
+        }
+        
+        select:focus, input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: white;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .radio-option input {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+        }
+        
+        .radio-option label {
+            margin-bottom: 0;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 18px 25px;
+            font-size: 17px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 10px;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+            background: linear-gradient(to right, #2980b9, #1c5a80);
+        }
+        
+        .result-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #e1e5eb;
+        }
+        
+        .result-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed #ddd;
+            min-height: 44px;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: 500;
+            color: #555;
+            font-size: 15px;
+            flex: 1;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 17px;
+            text-align: right;
+            flex: 1;
+            padding-left: 10px;
+        }
+        
+        .highlight {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            margin-top: 15px;
+        }
+        
+        .highlight .result-value {
+            color: #1a73e8;
+            font-size: 20px;
+        }
+        
+        .info-note {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .instrument-info {
+            display: none;
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            border-left: 3px solid #3498db;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px 15px;
+            color: #7f8c8d;
+            font-size: 13px;
+            border-top: 1px solid #eee;
+            line-height: 1.5;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        /* Стили для мобильных устройств */
+        @media (max-width: 767px) {
+            body {
+                padding: 10px;
+                font-size: 15px;
+            }
+            
+            .container {
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 15px 10px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header p {
+                font-size: 13px;
+            }
+            
+            .content {
+                padding: 15px 10px;
+            }
+            
+            .form-group {
+                margin-bottom: 18px;
+            }
+            
+            select, input[type="number"], input[type="text"] {
+                padding: 16px 12px;
+                font-size: 16px;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .radio-option {
+                min-width: 100%;
+                padding: 8px 0;
+            }
+            
+            .btn {
+                padding: 20px 15px;
+                font-size: 16px;
+            }
+            
+            .result-box {
+                padding: 15px;
+            }
+            
+            .result-title {
+                font-size: 18px;
+            }
+            
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+                min-height: auto;
+            }
+            
+            .result-value {
+                text-align: left;
+                padding-left: 0;
+                margin-top: 5px;
+                width: 100%;
+            }
+            
+            .highlight .result-value {
+                font-size: 18px;
+            }
+            
+            .info-note {
+                padding: 12px;
+                font-size: 13px;
+            }
+            
+            .section-title {
+                font-size: 17px;
+            }
+        }
+        
+        /* Стили для планшетов и десктопов */
+        @media (min-width: 768px) {
+            .content {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 30px;
+            }
+            
+            .calculator-section {
+                flex: 1;
+                min-width: 300px;
+                margin-bottom: 0;
+                padding-bottom: 0;
+                border-bottom: none;
+                border-right: 1px solid #eaeaea;
+                padding-right: 25px;
+            }
+            
+            .results-section {
+                flex: 1;
+                min-width: 300px;
+                padding-left: 25px;
+            }
+            
+            .result-item {
+                flex-direction: row;
+            }
+        }
+        
+        /* Улучшения для iOS Safari */
+        @supports (-webkit-touch-callout: none) {
+            select, input[type="number"], input[type="text"] {
+                font-size: 16px;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-item, .highlight, .info-note {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Точный калькулятор размера позиции</h1>
+            <p>На основе спецификаций контрактов вашего брокера</p>
+        </div>
+        
+        <div class="content">
+            <div class="calculator-section">
+                <div class="section-title">Основные параметры</div>
+                
+                <div class="form-group">
+                    <label for="instrument">Инструмент</label>
+                    <select id="instrument">
+                        <!-- Валютные пары -->
+                        <option value="EURUSD">EUR/USD (Евро/Доллар)</option>
+                        <option value="GBPUSD">GBP/USD (Фунт/Доллар)</option>
+                        <option value="USDJPY">USD/JPY (Доллар/Йена)</option>
+                        <option value="USDCAD">USD/CAD (Доллар/Канадский доллар)</option>
+                        <option value="AUDUSD">AUD/USD (Австралийский доллар/Доллар)</option>
+                        <!-- Металлы -->
+                        <option value="XAUUSD">XAU/USD (Золото)</option>
+                        <option value="XAGUSD">XAG/USD (Серебро)</option>
+                        <!-- Индексы -->
+                        <option value="SPX500">SPX500 (Индекс S&P 500)</option>
+                        <option value="JP225">JP225 (Индекс Nikkei 225)</option>
+                        <option value="GER40">GER40 (Индекс DAX 40)</option>
+                    </select>
+                    <div id="instrumentInfo" class="instrument-info"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="accountSize">Размер счета (USD)</label>
+                    <input type="number" id="accountSize" value="10000" min="100" step="100">
+                </div>
+                
+                <div class="form-group">
+                    <label>Риск на сделку</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="riskPercent" name="riskType" value="percent" checked>
+                            <label for="riskPercent">% от счета</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="riskFixed" name="riskType" value="fixed">
+                            <label for="riskFixed">Фиксированная сумма (USD)</label>
+                        </div>
+                    </div>
+                    <input type="number" id="riskValue" value="2" min="0.1" step="0.1" style="margin-top: 10px;">
+                </div>
+                
+                <div class="section-title">Параметры сделки</div>
+                
+                <div class="form-group">
+                    <label for="currentPrice">Текущая котировка</label>
+                    <input type="number" id="currentPrice" value="1.0800" min="0.0001" step="0.0001">
+                </div>
+                
+                <div class="form-group hidden" id="conversionRateGroup">
+                    <label for="conversionRate">Курс для конвертации</label>
+                    <input type="number" id="conversionRate" value="150.00" min="0.0001" step="0.0001">
+                </div>
+                
+                <div class="form-group">
+                    <label>Стоп-лосс</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="stopPips" name="stopType" value="pips" checked>
+                            <label for="stopPips" id="stopLabel">В пипсах/пунктах</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="stopPrice" name="stopType" value="price">
+                            <label for="stopPrice">По цене</label>
+                        </div>
+                    </div>
+                    <input type="number" id="stopValue" value="20" min="1" step="1" style="margin-top: 10px;">
+                </div>
+                
+                <button id="calculateBtn" class="btn">Рассчитать размер позиции</button>
+                
+                <div class="info-note">
+                    <strong>Важно:</strong> Расчеты основаны на точных данных из спецификаций контрактов.
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="result-title">Результаты расчета</div>
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Размер позиции (единицы):</span>
+                        <span id="positionSize" class="result-value">0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Объем в лотах:</span>
+                        <span id="lotsResult" class="result-value">0.00</span>
+                    </div>
+                    
+                    <div class="highlight">
+                        <div class="result-item">
+                            <span class="result-label">Рекомендуемый объем:</span>
+                            <span id="recommendedVolume" class="result-value">0.00 лот</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Риск на сделку:</span>
+                        <span id="riskAmount" class="result-value">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Стоп-лосс в пунктах:</span>
+                        <span id="stopPoints" class="result-value">0</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Стоимость пункта:</span>
+                        <span id="pipValue" class="result-value">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">% риска от счета:</span>
+                        <span id="riskPercentResult" class="result-value">0.00%</span>
+                    </div>
+                </div>
+                
+                <div class="info-note">
+                    <strong>Информация по инструментам:</strong><br>
+                    • Валютные пары: 1 лот = 100,000 единиц<br>
+                    • Золото: 1 лот = 100 унций<br>
+                    • Серебро: 1 лот = 5000 унций<br>
+                    • Индексы: SPX500=50, JP225=10, GER40=25<br>
+                    • Минимальный объем: 0.01 лота
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Калькулятор использует точные данные из спецификаций контрактов. Торговля на финансовых рынках связана с риском потери средств.</p>
+        </div>
+    </div>
+
+    <script>
+        // Проверка на мобильное устройство
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Данные инструментов
+        const instrumentData = {
+            'EURUSD': { 
+                type: 'forex', 
+                name: 'EUR/USD', 
+                contractSize: 100000, 
+                pipSize: 0.0001, 
+                pipValuePerLot: 10,
+                profitCurrency: 'USD', 
+                minVolume: 0.01, 
+                maxVolume: 20, 
+                volumeStep: 0.01, 
+                precision: 5, 
+                conversionRequired: false 
+            },
+            'GBPUSD': { 
+                type: 'forex', 
+                name: 'GBP/USD', 
+                contractSize: 100000, 
+                pipSize: 0.0001, 
+                pipValuePerLot: 10,
+                profitCurrency: 'USD', 
+                minVolume: 0.01, 
+                maxVolume: 20, 
+                volumeStep: 0.01, 
+                precision: 5, 
+                conversionRequired: false 
+            },
+            'USDJPY': { 
+                type: 'forex', 
+                name: 'USD/JPY', 
+                contractSize: 100000, 
+                pipSize: 0.01,
+                pipValuePerLot: 1000,
+                profitCurrency: 'JPY', 
+                minVolume: 0.01, 
+                maxVolume: 10, 
+                volumeStep: 0.01, 
+                precision: 3, 
+                conversionRequired: true,
+                conversionPair: 'USDJPY' 
+            },
+            'USDCAD': { 
+                type: 'forex', 
+                name: 'USD/CAD', 
+                contractSize: 100000, 
+                pipSize: 0.0001, 
+                pipValuePerLot: 10,
+                profitCurrency: 'CAD', 
+                minVolume: 0.01, 
+                maxVolume: 10, 
+                volumeStep: 0.01, 
+                precision: 5, 
+                conversionRequired: true,
+                conversionPair: 'USDCAD' 
+            },
+            'AUDUSD': { 
+                type: 'forex', 
+                name: 'AUD/USD', 
+                contractSize: 100000, 
+                pipSize: 0.0001, 
+                pipValuePerLot: 10,
+                profitCurrency: 'USD', 
+                minVolume: 0.01, 
+                maxVolume: 10, 
+                volumeStep: 0.01, 
+                precision: 5, 
+                conversionRequired: false 
+            },
+            'XAUUSD': { 
+                type: 'metal', 
+                name: 'Золото (XAU/USD)', 
+                contractSize: 100,
+                pipSize: 0.01,
+                pipValuePerLot: 1,
+                profitCurrency: 'USD', 
+                minVolume: 0.01, 
+                maxVolume: 10, 
+                volumeStep: 0.01, 
+                precision: 2, 
+                conversionRequired: false 
+            },
+            'XAGUSD': { 
+                type: 'metal', 
+                name: 'Серебро (XAG/USD)', 
+                contractSize: 5000,
+                pipSize: 0.001,
+                pipValuePerLot: 5,
+                profitCurrency: 'USD', 
+                minVolume: 0.01, 
+                maxVolume: 0.50, 
+                volumeStep: 0.01, 
+                precision: 3, 
+                conversionRequired: false 
+            },
+            'SPX500': { 
+                type: 'index', 
+                name: 'S&P 500 Index', 
+                contractSize: 50,
+                pipSize: 0.01,
+                pipValuePerLot: 0.5,
+                profitCurrency: 'USD', 
+                minVolume: 0.01, 
+                maxVolume: 10, 
+                volumeStep: 0.01, 
+                precision: 2, 
+                conversionRequired: false 
+            },
+            'JP225': { 
+                type: 'index', 
+                name: 'Nikkei 225 Index', 
+                contractSize: 10,
+                pipSize: 1,
+                pipValuePerLot: 10,
+                profitCurrency: 'JPY', 
+                minVolume: 0.01, 
+                maxVolume: 10, 
+                volumeStep: 0.01, 
+                precision: 2, 
+                conversionRequired: true,
+                conversionPair: 'USDJPY' 
+            },
+            'GER40': { 
+                type: 'index', 
+                name: 'DAX 40 Index', 
+                contractSize: 25,
+                pipSize: 0.01,
+                pipValuePerLot: 0.25,
+                profitCurrency: 'EUR', 
+                minVolume: 0.01, 
+                maxVolume: 10, 
+                volumeStep: 0.01, 
+                precision: 2, 
+                conversionRequired: true,
+                conversionPair: 'EURUSD' 
+            }
+        };
+
+        // DOM элементы
+        const elements = {
+            instrument: document.getElementById('instrument'),
+            accountSize: document.getElementById('accountSize'),
+            riskValue: document.getElementById('riskValue'),
+            currentPrice: document.getElementById('currentPrice'),
+            conversionRate: document.getElementById('conversionRate'),
+            conversionRateGroup: document.getElementById('conversionRateGroup'),
+            stopValue: document.getElementById('stopValue'),
+            calculateBtn: document.getElementById('calculateBtn'),
+            stopLabel: document.getElementById('stopLabel'),
+            instrumentInfo: document.getElementById('instrumentInfo'),
+            positionSize: document.getElementById('positionSize'),
+            lotsResult: document.getElementById('lotsResult'),
+            recommendedVolume: document.getElementById('recommendedVolume'),
+            riskAmount: document.getElementById('riskAmount'),
+            stopPoints: document.getElementById('stopPoints'),
+            pipValue: document.getElementById('pipValue'),
+            riskPercentResult: document.getElementById('riskPercentResult')
+        };
+
+        // Функция обновления информации об инструменте
+        function updateInstrumentInfo() {
+            const instrument = elements.instrument.value;
+            const data = instrumentData[instrument];
+            
+            if (!data) return;
+            
+            // Обновляем label для стоп-лосса
+            elements.stopLabel.textContent = data.type === 'forex' ? 'В пипсах' : 
+                                            data.type === 'metal' ? 'В долларах за унцию' : 'В пунктах';
+            
+            // Показываем/скрываем поле конвертации
+            if (data.conversionRequired) {
+                elements.conversionRateGroup.classList.remove('hidden');
+            } else {
+                elements.conversionRateGroup.classList.add('hidden');
+            }
+            
+            // Обновляем информацию об инструменте
+            let infoText = `<strong>${data.name}</strong><br>`;
+            infoText += `Размер контракта: ${data.contractSize.toLocaleString()} ${data.type === 'metal' ? 'унций' : 'единиц'}<br>`;
+            infoText += `Точность: ${data.precision} знака<br>`;
+            infoText += `Минимальный объем: ${data.minVolume} лота<br>`;
+            infoText += `Максимальный объем: ${data.maxVolume} лотов<br>`;
+            infoText += `Валюта прибыли: ${data.profitCurrency}`;
+            
+            if (data.conversionRequired) {
+                infoText += ` (требуется конвертация)`;
+            }
+            
+            if (instrument === 'XAGUSD') {
+                infoText += `<br><strong>Внимание:</strong> Максимальный объем ограничен 0.5 лота`;
+            }
+            
+            elements.instrumentInfo.innerHTML = infoText;
+            elements.instrumentInfo.style.display = 'block';
+            
+            // Устанавливаем значения по умолчанию
+            const defaultPrices = {
+                'EURUSD': 1.0800, 'GBPUSD': 1.2500, 'USDJPY': 150.00, 
+                'USDCAD': 1.3500, 'AUDUSD': 0.6600, 'XAUUSD': 2350.00, 
+                'XAGUSD': 28.50, 'SPX500': 5200.00, 'JP225': 38000.00, 
+                'GER40': 18000.00
+            };
+            
+            if (defaultPrices[instrument]) {
+                elements.currentPrice.value = defaultPrices[instrument];
+            }
+            
+            const defaultStops = {
+                'EURUSD': 20, 'GBPUSD': 25, 'USDJPY': 30, 'USDCAD': 25, 
+                'AUDUSD': 20, 'XAUUSD': 100, 'XAGUSD': 0.50, 'SPX500': 50, 
+                'JP225': 100, 'GER40': 60
+            };
+            
+            if (defaultStops[instrument]) {
+                elements.stopValue.value = defaultStops[instrument];
+            }
+            
+            // Принудительно запускаем расчет
+            setTimeout(calculatePosition, 10);
+        }
+
+        // Основная функция расчета
+        function calculatePosition() {
+            try {
+                const instrument = elements.instrument.value;
+                const data = instrumentData[instrument];
+                
+                if (!data) return;
+                
+                // Получаем значения из формы
+                const accountSize = parseFloat(elements.accountSize.value) || 0;
+                const riskValue = parseFloat(elements.riskValue.value) || 0;
+                const currentPrice = parseFloat(elements.currentPrice.value) || 0;
+                const stopValue = parseFloat(elements.stopValue.value) || 0;
+                const riskType = document.querySelector('input[name="riskType"]:checked').value;
+                const stopType = document.querySelector('input[name="stopType"]:checked').value;
+                
+                // Рассчитываем сумму риска
+                let riskAmount = riskType === 'percent' ? accountSize * (riskValue / 100) : riskValue;
+                
+                // Рассчитываем стоп-лосс в пунктах
+                let stopPoints;
+                if (stopType === 'pips') {
+                    stopPoints = stopValue;
+                } else {
+                    const priceDiff = Math.abs(currentPrice - stopValue);
+                    stopPoints = priceDiff / data.pipSize;
+                }
+                
+                // Рассчитываем стоимость пункта
+                let pipValueInUSD = data.pipValuePerLot;
+                
+                if (data.conversionRequired) {
+                    const conversionRate = parseFloat(elements.conversionRate.value) || 1;
+                    if (conversionRate > 0) {
+                        if (data.profitCurrency === 'JPY' || data.profitCurrency === 'CAD') {
+                            pipValueInUSD = data.pipValuePerLot / conversionRate;
+                        } else if (data.profitCurrency === 'EUR') {
+                            pipValueInUSD = data.pipValuePerLot * conversionRate;
+                        }
+                    }
+                }
+                
+                // Рассчитываем размер позиции в лотах
+                let lots = 0;
+                if (stopPoints > 0 && pipValueInUSD > 0) {
+                    lots = riskAmount / (stopPoints * pipValueInUSD);
+                }
+                
+                // Ограничиваем лоты
+                if (lots < data.minVolume) lots = 0;
+                if (lots > data.maxVolume) lots = data.maxVolume;
+                lots = Math.round(lots / data.volumeStep) * data.volumeStep;
+                
+                // Рассчитываем остальные значения
+                const positionSize = lots * data.contractSize;
+                const totalRiskAmount = stopPoints * pipValueInUSD * lots;
+                const riskPercent = accountSize > 0 ? (totalRiskAmount / accountSize) * 100 : 0;
+                
+                // Обновляем интерфейс
+                elements.positionSize.textContent = positionSize.toLocaleString('ru-RU', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                
+                elements.lotsResult.textContent = lots.toFixed(3);
+                
+                let recommendedText = '';
+                if (lots >= 1) {
+                    recommendedText = `${lots.toFixed(2)} лотов`;
+                } else if (lots >= 0.1) {
+                    recommendedText = `${(lots * 10).toFixed(2)} мини-лотов`;
+                } else if (lots > 0) {
+                    recommendedText = `${(lots * 100).toFixed(2)} микро-лотов`;
+                } else {
+                    recommendedText = '0.00 лот';
+                }
+                
+                elements.recommendedVolume.textContent = recommendedText;
+                elements.riskAmount.textContent = '$' + totalRiskAmount.toFixed(2);
+                elements.stopPoints.textContent = stopPoints.toFixed(data.type === 'metal' ? 3 : 1);
+                elements.pipValue.textContent = '$' + pipValueInUSD.toFixed(4);
+                elements.riskPercentResult.textContent = riskPercent.toFixed(2) + '%';
+                
+            } catch (error) {
+                console.error('Ошибка расчета:', error);
+            }
+        }
+
+        // Функция инициализации событий
+        function initEvents() {
+            // Событие изменения инструмента
+            elements.instrument.addEventListener('change', updateInstrumentInfo);
+            
+            // Кнопка расчета
+            elements.calculateBtn.addEventListener('click', calculatePosition);
+            
+            // События для всех полей ввода
+            const allInputs = [
+                elements.accountSize,
+                elements.riskValue,
+                elements.currentPrice,
+                elements.conversionRate,
+                elements.stopValue
+            ];
+            
+            // События для радио-кнопок
+            document.querySelectorAll('input[name="riskType"]').forEach(radio => {
+                radio.addEventListener('change', calculatePosition);
+            });
+            
+            document.querySelectorAll('input[name="stopType"]').forEach(radio => {
+                radio.addEventListener('change', calculatePosition);
+            });
+            
+            // Обработчики для мобильных устройств
+            if (isMobile) {
+                // Добавляем touch-события для всех полей ввода
+                allInputs.forEach(input => {
+                    input.addEventListener('touchstart', calculatePosition);
+                    input.addEventListener('touchend', calculatePosition);
+                    input.addEventListener('input', calculatePosition);
+                    input.addEventListener('change', calculatePosition);
+                });
+                
+                // Добавляем touch-события для выпадающего списка
+                elements.instrument.addEventListener('touchstart', calculatePosition);
+                elements.instrument.addEventListener('change', calculatePosition);
+                
+                // Пересчет при скрытии клавиатуры
+                document.addEventListener('focusout', function() {
+                    setTimeout(calculatePosition, 100);
+                });
+                
+            } else {
+                // Для десктопов - стандартные события
+                allInputs.forEach(input => {
+                    input.addEventListener('input', calculatePosition);
+                    input.addEventListener('change', calculatePosition);
+                });
+                
+                elements.instrument.addEventListener('change', calculatePosition);
+            }
+            
+            // Пересчет при изменении ориентации устройства
+            window.addEventListener('orientationchange', function() {
+                setTimeout(calculatePosition, 300);
+            });
+            
+            // Пересчет при загрузке страницы
+            window.addEventListener('load', function() {
+                setTimeout(calculatePosition, 100);
+            });
+        }
+
+        // Инициализация при загрузке DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            updateInstrumentInfo();
+            initEvents();
+            
+            // Принудительный расчет через 500мс после загрузки
+            setTimeout(calculatePosition, 500);
+            
+            // Дополнительный пересчет для мобильных устройств
+            if (isMobile) {
+                // Пересчет каждые 2 секунды при активном вводе
+                setInterval(function() {
+                    if (document.activeElement && 
+                        (document.activeElement.tagName === 'INPUT' || 
+                         document.activeElement.tagName === 'SELECT')) {
+                        calculatePosition();
+                    }
+                }, 2000);
+                
+                // Пересчет при любом касании экрана
+                document.addEventListener('touchstart', function() {
+                    setTimeout(calculatePosition, 50);
+                });
+            }
+        });
+
+        // Глобальный экспорт функции для отладки
+        window.calculatePosition = calculatePosition;
+    </script>
+</body>
+</html>
